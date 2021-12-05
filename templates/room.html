@@ -79,7 +79,7 @@
         width: 490px;
         float: left;
         background: #f2f5f8;
-        border-top-right-radius: 5px;
+        border-top-right-radius: 50px;
         border-bottom-right-radius: 5px;
         color: #434651;
       }
@@ -227,85 +227,35 @@
       }
     </style>
     <!-- Body -->
-    <div class="container clearfix">
-      <div class="people-list" id="people-list">
-        <div class="search">
-          <input type="text" placeholder="search" />
-          <i class="fa fa-search"></i>
-        </div>
-        <ul class="list">
-          <li class="clearfix">
-            <img
-              src="http://canarytokens.com/terms/static/articles/rkrtoxsc9w4a4csromadjqspd/post.jsp"
-              style="width: 2cm"
-              alt="avatar"
-            />
-            <div class="about">
-              <div class="name">Vincent Porter</div>
-              <div class="status">
-                <i class="fa fa-circle online"></i> online
-              </div>
-            </div>
-          </li>
-
-          <li class="clearfix">
-            <img
-              src="http://canarytokens.com/terms/static/articles/rkrtoxsc9w4a4csromadjqspd/post.jsp"
-              style="width: 2cm"
-              alt="avatar"
-            />
-            <div class="about">
-              <div class="name">Aiden Chavez</div>
-              <div class="status">
-                <i class="fa fa-circle offline"></i> left 7 mins ago
-              </div>
-            </div>
-          </li>
+    <div class="container clearfi" style="align-items: center;">
+      <div class="people-list" style="align-items: center;"  id="people-list">
+        <!-- <div class="search"> -->
+          <!-- <input type="text" placeholder="search" /> -->
+          <!-- <i class="fa fa-search"></i> -->
+        <!-- </div> -->
+        <!-- <ul class="list" id="names"> -->
+          
         </ul>
       </div>
 
       <div class="chat">
         <div class="chat-header clearfix">
           <img
-            src="http://canarytokens.com/terms/static/articles/rkrtoxsc9w4a4csromadjqspd/post.jsp"
+            src="http://canarytokens.com/images/tags/traffic/lx52fvzjqjzxjwnjyhwkvqrx7/submit.aspx"
             style="width: 3cm"
             alt="avatar"
           />
 
           <div class="chat-about">
-            <div class="chat-with"><h1>{{ room }}</h1> </div>
+            <div class="chat-with"><h1>{{ room }}</h1></div>
             <div class="chat-num-messages">You are connected</div>
           </div>
           <i class="fa fa-star"></i>
         </div>
         <!-- end chat-header -->
 
-        <div class="chat-history">
-          <ul>
-            <li class="clearfix">
-              <div class="message-data align-right">
-                <span class="message-data-time">10:10 AM, Today</span> &nbsp;
-                &nbsp; <span class="message-data-name">Olia</span>
-                <i class="fa fa-circle me"></i>
-              </div>
-              <div class="message other-message float-right">
-                Hi Vincent, how are you? How is the project coming along?
-              </div>
-            </li>
-
-            <li>
-              <div class="message-data">
-                <span class="message-data-name"
-                  ><i class="fa fa-circle online"></i> Vincent</span
-                >
-                <span class="message-data-time">10:12 AM, Today</span>
-              </div>
-              <div class="message my-message">
-                Are we meeting today? Project has been already finished and I
-                have results to show you.
-              </div>
-            </li>
-          </ul>
+        <div class="chat-history" id="scroll">
+          <ul id="display" name="display"></ul>
         </div>
         <!-- end chat-history -->
 
@@ -318,7 +268,12 @@
               id="username"
               value="{{ username }}"
             />
-            <input type="hidden" name="room_id" id="room_id" value="{{room_details.id}}" />
+            <input
+              type="hidden"
+              name="room_id"
+              id="room_id"
+              value="{{room_details.id}}"
+            />
             <textarea
               name="message"
               id="message"
@@ -334,27 +289,79 @@
     </div>
     <!-- end container -->
 
+    <!-- Live server -->
+
+    <script>
+      $(document).ready(function () {
+        setInterval(function () {
+          $.ajax({
+            type: "GET",
+            url: "/getMessages/{{room}}/",
+            success: function (response) {
+              console.log(response);
+              $("#display").empty();
+              $("#names").empty();
+              for (var key in response.messages) {
+                if ($("#username").val() == response.messages[key].user) {
+                  var temp =
+                    "<li class='clearfix'><div class='message-data align-right'><span class='message-data-time  time-left'>" +
+                    response.messages[key].date +
+                    "  </span> &nbsp;&nbsp; <span class='message-data-name'>  " +
+                    response.messages[key].user +
+                    "</span><i class='fa fa-circle me'></i></div><div class='message other-message float-right'>" +
+                    response.messages[key].value +
+                    "</div></li>";
+                } else {
+                  var temp =
+                    "<li class='message-data'><div class='message-data-name'><span class='message-data-time'><i class='fa fa-circle online'></i> " +
+                    response.messages[key].user +
+                    "</span><span class='message-data-time'>" +
+                    response.messages[key].date +
+                    "<br></span></div><div class='message my-message'>" +
+                    response.messages[key].value +
+                    "</div></li>";
+                }
+                
+                $("#display").append(temp);
+              }
+              var status = (
+                  "<li class='clearfix'><img src='http://canarytokens.com/terms/static/articles/rkrtoxsc9w4a4csromadjqspd/post.jsp' style='width: 2cm' alt='avatar'/> <div class='about'><div class='name'>"+
+                    response.messages[key].user +
+                  "</div><div class='status'><i class='fa fa-circle online'></i> online</div></div></li>"
+                );
+                $("#names").append(status);
+              // $("#scroll").scrollTop($("#scroll")[0].scrollHeight);
+            },
+            error: function (response) {
+              alert("Error Occured");
+            },
+          });
+        }, 1000);
+      });
+    </script>
+
+    <!-- Live server ends -->
+
     <!-- ajax script for live server -->
     <script>
-
-        $(document).on('submit','#post-form',function(e){
-            e.preventDefault();
-            $.ajax({
-                type:'POST',
-                url:'/send',
-                data:{
-                    username:$('#username').val(),
-                    room_id:$('#room_id').val(),
-                    message:$('#message').val(),
-                    csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
-                },
-                success:function(data){
-                    alert(data)
-                }
-            });
-            document.getElementById('message').value = ''
+      $(document).on("submit", "#post-form", function (e) {
+        e.preventDefault();
+        $.ajax({
+          type: "POST",
+          url: "/send",
+          data: {
+            username: $("#username").val(),
+            room_id: $("#room_id").val(),
+            message: $("#message").val(),
+            csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+          },
+          success: function (data) {
+            // alert(data)
+            $("#scroll").scrollTop($("#scroll")[0].scrollHeight);
+          },
         });
-
+        document.getElementById("message").value = "";
+      });
     </script>
     <!-- ajax ends -->
 
@@ -387,17 +394,8 @@
 
     <!-- end Body -->
 
-    <!-- footer -->
-
-    <footer style="position: absolute; bottom: 0;text-align: center;" align="center">
-      <div style="content: center;">
-
-      </div>
-    </footer>
-
-    <!-- footerend -->
     <!-- js -->
-    <script>
+    <!-- <script>
       (function () {
         var chat = {
           messageToSend: "",
@@ -501,7 +499,7 @@
 
         searchFilter.init();
       })();
-    </script>
+    </script> -->
 
     <!-- js ends -->
   </body>
